@@ -430,6 +430,15 @@ $(document).ready(function() {
         $("#board-name").focus();
     });
     
+    // Manejar el input de importación rápida
+    $("#quick-import-file").on("change", function(e) {
+        if (this.files.length > 0) {
+            importFromJSON(this.files[0]);
+            // Limpiar el input para que pueda detectar el mismo archivo de nuevo
+            $(this).val('');
+        }
+    });
+    
     // Manejar la carga de tableros (delegación de eventos)
     $("#boards-list").on("click", ".load-board", function() {
         const boardId = $(this).data("id");
@@ -490,7 +499,7 @@ $(document).ready(function() {
             alert("Por favor, selecciona un archivo para importar.");
         }
     });
-
+    
     // Manejar el envío del formulario de vida
     $("#life-form").on("submit", function(e) {
         e.preventDefault();
