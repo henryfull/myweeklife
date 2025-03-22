@@ -11,11 +11,24 @@
 </head>
 <body>
     <div class="container-fluid mt-4">
+        <!-- Botón para mostrar/ocultar el sidebar en mobile -->
+        <button id="sidebar-toggle" class="btn btn-primary d-lg-none mb-3">
+            <i class="bi bi-list"></i> Menú
+        </button>
+        
+        <!-- Fondo oscuro para cuando el sidebar está abierto en móvil -->
+        <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+        
         <div class="row">
             <!-- Panel lateral con las opciones -->
-            <div class="col-lg-3 sidebar">
+            <div class="col-lg-3 sidebar" id="sidebar">
                 <div class="sticky-top" style="top: 20px;">
-                    <h2 class="mb-4">Mi Vida en Semanas</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Mi Vida en Semanas</h2>
+                        <button id="sidebar-close" class="btn btn-sm btn-outline-secondary d-lg-none">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
                     
                     <!-- Sección de autenticación -->
                     <div id="auth-section" class="mb-4">

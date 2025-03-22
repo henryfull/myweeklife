@@ -28,6 +28,12 @@ let usedHours = 0;
 let barChart = null;
 let pieChart = null;
 
+// Nuevas variables para el manejo del sidebar
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebarClose = document.getElementById('sidebar-close');
+const sidebar = document.getElementById('sidebar');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
 // Función para generar un ID único
 function generateId() {
     return Date.now() + Math.floor(Math.random() * 1000);
@@ -655,8 +661,11 @@ function importFromJSON(file) {
     reader.readAsText(file);
 }
 
-// Inicializar la aplicación cuando el DOM esté listo
-$(document).ready(function() {
+// Función para inicializar
+window.onload = function() {
+    // Inicialización del sidebar responsive
+    initSidebar();
+    
     // Inicializar el selector de color
     $("#activity-color").spectrum({
         preferredFormat: "hex",
@@ -669,7 +678,7 @@ $(document).ready(function() {
         ],
         color: getRandomColor()
     });
-
+    
     // Cargar tableros guardados
     updateBoardsList();
     
@@ -873,7 +882,43 @@ $(document).ready(function() {
     // Manejadores de eventos para autenticación
     $("#google-login-btn").on("click", loginWithGoogle);
     $("#logout-btn").on("click", logout);
-});
+};
+
+// Función para inicializar el sidebar responsive
+function initSidebar() {
+    // Mostrar sidebar
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.add('show');
+        sidebarBackdrop.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevenir scroll
+    });
+    
+    // Ocultar sidebar (botón X)
+    sidebarClose.addEventListener('click', function() {
+        closeSidebar();
+    });
+    
+    // Ocultar sidebar (backdrop)
+    sidebarBackdrop.addEventListener('click', function() {
+        closeSidebar();
+    });
+    
+    // Cerrar sidebar en cambio de tamaño de pantalla
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992) {
+            sidebar.classList.remove('show');
+            sidebarBackdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
+// Función para cerrar el sidebar
+function closeSidebar() {
+    sidebar.classList.remove('show');
+    sidebarBackdrop.classList.remove('show');
+    document.body.style.overflow = ''; // Restaurar scroll
+}
 
 // Función para calcular las horas en la calculadora
 function calculateHours() {

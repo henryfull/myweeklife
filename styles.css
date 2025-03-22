@@ -2,6 +2,7 @@
 body {
     background-color: #f5f5f5;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 h1, h2, h3, h4, h5 {
@@ -26,10 +27,37 @@ h1, h2, h3, h4, h5 {
     padding: 20px;
     border-right: 1px solid #dee2e6;
     height: 100%;
+    transition: all 0.3s ease;
 }
 
 .sticky-top {
     z-index: 1020;
+}
+
+/* Botón de toggle para sidebar */
+#sidebar-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1030;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 50px;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+#sidebar-toggle:hover {
+    transform: translateY(-2px);
+}
+
+#sidebar-close {
+    transition: all 0.2s ease;
+}
+
+#sidebar-close:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
 }
 
 /* Estilos para la configuración */
@@ -285,10 +313,42 @@ h1, h2, h3, h4, h5 {
 /* Responsive */
 @media (max-width: 992px) {
     .sidebar {
-        margin-bottom: 20px;
-        border-right: none;
-        border-bottom: 1px solid #dee2e6;
-        padding-bottom: 20px;
+        position: fixed;
+        left: -100%;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 1040;
+        width: 85%;
+        max-width: 320px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        padding-top: 20px;
+    }
+    
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .main-content {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding-top: 60px; /* Espacio para el botón de toggle */
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1039;
+        display: none;
+    }
+    
+    .sidebar-backdrop.show {
+        display: block;
     }
 }
 
@@ -324,6 +384,20 @@ h1, h2, h3, h4, h5 {
     .year-label {
         width: 25px;
         font-size: 0.65rem;
+    }
+    
+    #sidebar-toggle {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 
