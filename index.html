@@ -178,10 +178,30 @@
                     <div id="export-section" class="mb-4" style="display: none;">
                         <div class="card">
                             <div class="card-header bg-dark text-white">
-                                <h5 class="mb-0">Exportar Tablero</h5>
+                                <h5 class="mb-0">Exportar/Importar Tablero</h5>
                             </div>
                             <div class="card-body">
-                                <button type="button" id="export-pdf-btn" class="btn btn-danger w-100">Descargar como PDF</button>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Exportar tablero</label>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" id="export-pdf-btn" class="btn btn-danger">
+                                            <i class="bi bi-file-earmark-pdf"></i> Descargar como PDF
+                                        </button>
+                                        <button type="button" id="export-json-btn" class="btn btn-primary">
+                                            <i class="bi bi-file-earmark-code"></i> Exportar como JSON
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="form-label fw-bold">Importar tablero</label>
+                                    <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="import-json-file" accept=".json">
+                                        <button class="btn btn-success" type="button" id="import-json-btn">
+                                            <i class="bi bi-upload"></i> Importar
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Selecciona un archivo JSON exportado previamente</small>
+                                </div>
                             </div>
                         </div>
                     </div>

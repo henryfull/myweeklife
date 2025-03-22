@@ -282,6 +282,129 @@ function exportToPDF() {
     html2pdf().from(gridContainer[0]).set(options).save();
 }
 
+// Función para exportar un tablero a JSON
+function exportToJSON() {
+    if (!currentBoardId) {
+        alert("No hay un tablero activo para exportar.");
+        return;
+    }
+    
+    // Buscar el tablero actual
+    const boards = getStoredBoards();
+    const currentBoard = boards.find(b => b.id === currentBoardId);
+    
+    if (!currentBoard) {
+        alert("Error: No se pudo encontrar el tablero para exportar.");
+        return;
+    }
+    
+    // Crear un objeto de datos para la exportación
+    const exportData = {
+        boardData: currentBoard,
+        exportedAt: new Date().toISOString(),
+        appVersion: "1.0" // Para control de versiones futuras
+    };
+    
+    // Convertir a cadena JSON
+    const jsonString = JSON.stringify(exportData, null, 2);
+    
+    // Crear un blob con el contenido
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    
+    // Crear URL para el blob
+    const url = URL.createObjectURL(blob);
+    
+    // Crear un elemento de enlace para descargar
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tablero-${currentBoard.name.replace(/\s+/g, '-').toLowerCase()}.json`;
+    
+    // Simular clic para descargar
+    document.body.appendChild(a);
+    a.click();
+    
+    // Limpiar
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+// Función para importar un tablero desde JSON
+function importFromJSON(file) {
+    if (!file) {
+        alert("Por favor, selecciona un archivo para importar.");
+        return;
+    }
+    
+    // Verificar tipo de archivo
+    if (file.type !== "application/json") {
+        alert("El archivo debe ser de tipo JSON.");
+        return;
+    }
+    
+    // Leer el archivo
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            // Parsear el JSON
+            const importData = JSON.parse(e.target.result);
+            
+            // Validar que tenga la estructura correcta
+            if (!importData.boardData || !importData.boardData.id || 
+                !importData.boardData.name || !importData.boardData.activities) {
+                throw new Error("El archivo no tiene un formato válido de tablero.");
+            }
+            
+            // Obtener los tableros existentes
+            const existingBoards = getStoredBoards();
+            
+            // Verificar si ya existe un tablero con el mismo ID
+            const existingBoardIndex = existingBoards.findIndex(b => b.id === importData.boardData.id);
+            
+            // Generar nuevo ID para evitar colisiones
+            const boardToImport = {
+                ...importData.boardData,
+                id: generateId(), // Nuevo ID para evitar conflictos
+                importedAt: new Date().toISOString()
+            };
+            
+            // Añadir " (importado)" al nombre para distinguirlo si hay duplicados
+            if (existingBoards.some(b => b.name === boardToImport.name)) {
+                boardToImport.name += " (importado)";
+            }
+            
+            // Añadir a la lista de tableros
+            existingBoards.push(boardToImport);
+            
+            // Guardar en localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(existingBoards));
+            
+            // Actualizar la lista de tableros
+            updateBoardsList();
+            
+            // Mostrar mensaje de éxito
+            alert(`Tablero "${boardToImport.name}" importado correctamente.`);
+            
+            // Preguntar si desea cargar el tablero importado
+            if (confirm(`¿Deseas cargar el tablero "${boardToImport.name}" ahora?`)) {
+                loadBoard(boardToImport.id);
+            }
+            
+        } catch (error) {
+            console.error("Error al importar:", error);
+            alert("Error al importar el tablero: " + error.message);
+        }
+    };
+    
+    reader.onerror = function() {
+        alert("Error al leer el archivo.");
+    };
+    
+    reader.readAsText(file);
+}
+
 // Inicializar la aplicación cuando el DOM esté listo
 $(document).ready(function() {
     // Inicializar el selector de color
@@ -351,6 +474,21 @@ $(document).ready(function() {
     // Manejar el botón de exportar a PDF
     $("#export-pdf-btn").on("click", function() {
         exportToPDF();
+    });
+    
+    // Manejar el botón de exportar a JSON
+    $("#export-json-btn").on("click", function() {
+        exportToJSON();
+    });
+    
+    // Manejar el botón de importar desde JSON
+    $("#import-json-btn").on("click", function() {
+        const fileInput = document.getElementById('import-json-file');
+        if (fileInput.files.length > 0) {
+            importFromJSON(fileInput.files[0]);
+        } else {
+            alert("Por favor, selecciona un archivo para importar.");
+        }
     });
 
     // Manejar el envío del formulario de vida
