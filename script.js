@@ -7,6 +7,8 @@ let isGridGenerated = false;
 let currentBoardId = null;
 let currentBoardName = "";
 let currentChartSort = "default"; // Valor por defecto para ordenación
+let currentUser = null; // Usuario autenticado actual
+let isOnlineSync = false; // Si los tableros están sincronizados en la nube
 const WEEKS_PER_YEAR = 52;
 const HOURS_PER_DAY = 24;
 const DAYS_PER_WEEK = 7;
@@ -41,7 +43,224 @@ function getRandomColor() {
     return color;
 }
 
-// Función para guardar los datos en localStorage
+// FUNCIONES DE AUTENTICACIÓN Y SINCRONIZACIÓN
+// -------------------------------------------
+
+// Función para iniciar sesión con Google
+function loginWithGoogle() {
+    auth.signInWithPopup(googleProvider)
+        .then((result) => {
+            // Usuario autenticado correctamente
+            const user = result.user;
+            currentUser = user;
+            
+            // Actualizar UI
+            updateAuthUI(user);
+            
+            // Sincronizar tableros
+            syncBoardsAfterLogin(user);
+        })
+        .catch((error) => {
+            console.error("Error en la autenticación:", error);
+            alert(`Error al iniciar sesión: ${error.message}`);
+        });
+}
+
+// Función para cerrar sesión
+function logout() {
+    auth.signOut()
+        .then(() => {
+            currentUser = null;
+            isOnlineSync = false;
+            updateAuthUI(null);
+        })
+        .catch((error) => {
+            console.error("Error al cerrar sesión:", error);
+        });
+}
+
+// Actualizar la interfaz según el estado de autenticación
+function updateAuthUI(user) {
+    if (user) {
+        // Mostrar interfaz de usuario logueado
+        $("#not-logged-in").hide();
+        $("#logged-in").show();
+        
+        // Actualizar información del usuario
+        $("#user-name").text(user.displayName);
+        $("#user-email").text(user.email);
+        $("#user-photo").attr("src", user.photoURL || "https://via.placeholder.com/40");
+        
+        // Actualizar estado de sincronización
+        if (isOnlineSync) {
+            $("#sync-status").html(`
+                <div class="alert alert-success py-2 small">
+                    <i class="bi bi-check-circle-fill me-1"></i> Tableros sincronizados
+                </div>
+            `);
+        } else {
+            $("#sync-status").html(`
+                <div class="alert alert-warning py-2 small">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Sincronizando...
+                </div>
+            `);
+        }
+    } else {
+        // Mostrar interfaz de login
+        $("#logged-in").hide();
+        $("#not-logged-in").show();
+    }
+}
+
+// Sincronizar tableros después del login
+function syncBoardsAfterLogin(user) {
+    // Mostrar indicador de sincronización
+    $("#sync-status").html(`
+        <div class="alert alert-warning py-2 small">
+            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Sincronizando tableros...
+        </div>
+    `);
+    
+    // Obtener tableros del almacenamiento local
+    const localBoards = getStoredBoards();
+    
+    // Referencia a la colección de tableros del usuario en Firestore
+    const userBoardsRef = db.collection('users').doc(user.uid).collection('boards');
+    
+    // Obtener tableros de Firestore
+    userBoardsRef.get()
+        .then((snapshot) => {
+            const cloudBoards = [];
+            snapshot.forEach((doc) => {
+                cloudBoards.push(doc.data());
+            });
+            
+            // Fusionar tableros locales y en la nube
+            return mergeAndSyncBoards(localBoards, cloudBoards, userBoardsRef, user);
+        })
+        .then(() => {
+            isOnlineSync = true;
+            
+            // Actualizar UI con estado de sincronización exitosa
+            $("#sync-status").html(`
+                <div class="alert alert-success py-2 small">
+                    <i class="bi bi-check-circle-fill me-1"></i> Tableros sincronizados correctamente
+                </div>
+            `);
+            
+            // Actualizar lista de tableros
+            updateBoardsList();
+        })
+        .catch((error) => {
+            console.error("Error al sincronizar tableros:", error);
+            
+            $("#sync-status").html(`
+                <div class="alert alert-danger py-2 small">
+                    <i class="bi bi-x-circle-fill me-1"></i> Error de sincronización: ${error.message}
+                </div>
+            `);
+        });
+}
+
+// Fusionar y sincronizar tableros locales y en la nube
+function mergeAndSyncBoards(localBoards, cloudBoards, userBoardsRef, user) {
+    // Crear un mapa de tableros en la nube por ID para búsqueda rápida
+    const cloudBoardsMap = {};
+    cloudBoards.forEach(board => {
+        cloudBoardsMap[board.id] = board;
+    });
+    
+    // Crear un mapa de tableros locales por ID
+    const localBoardsMap = {};
+    localBoards.forEach(board => {
+        localBoardsMap[board.id] = board;
+    });
+    
+    const mergedBoards = [];
+    const syncPromises = [];
+    
+    // Procesar tableros locales
+    localBoards.forEach(localBoard => {
+        const cloudBoard = cloudBoardsMap[localBoard.id];
+        
+        if (!cloudBoard) {
+            // Tablero local no existe en la nube - subir
+            syncPromises.push(
+                userBoardsRef.doc(localBoard.id.toString()).set({
+                    ...localBoard,
+                    userId: user.uid,
+                    syncedAt: new Date().toISOString()
+                })
+            );
+            mergedBoards.push(localBoard);
+        } else {
+            // Ambos existen - usar el más reciente
+            const localUpdatedAt = new Date(localBoard.updatedAt);
+            const cloudUpdatedAt = new Date(cloudBoard.updatedAt);
+            
+            if (localUpdatedAt > cloudUpdatedAt) {
+                // El local es más reciente - subir
+                syncPromises.push(
+                    userBoardsRef.doc(localBoard.id.toString()).set({
+                        ...localBoard,
+                        userId: user.uid,
+                        syncedAt: new Date().toISOString()
+                    })
+                );
+                mergedBoards.push(localBoard);
+            } else {
+                // El de la nube es más reciente - usar ese
+                mergedBoards.push(cloudBoard);
+            }
+        }
+    });
+    
+    // Procesar tableros en la nube que no existen localmente
+    cloudBoards.forEach(cloudBoard => {
+        if (!localBoardsMap[cloudBoard.id]) {
+            mergedBoards.push(cloudBoard);
+        }
+    });
+    
+    // Guardar los tableros fusionados en localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedBoards));
+    
+    // Devolver promesa de sincronización
+    return Promise.all(syncPromises);
+}
+
+// Guardar tablero en Firestore si el usuario está autenticado
+function saveToFirestore(boardData) {
+    if (!currentUser) return Promise.resolve(); // No hacer nada si no hay usuario
+    
+    const userBoardsRef = db.collection('users').doc(currentUser.uid).collection('boards');
+    
+    return userBoardsRef.doc(boardData.id.toString()).set({
+        ...boardData,
+        userId: currentUser.uid,
+        syncedAt: new Date().toISOString()
+    })
+    .then(() => {
+        // Actualizar estado de sincronización
+        isOnlineSync = true;
+        $("#sync-status").html(`
+            <div class="alert alert-success py-2 small">
+                <i class="bi bi-check-circle-fill me-1"></i> Tableros sincronizados
+            </div>
+        `);
+    })
+    .catch((error) => {
+        console.error("Error al guardar en Firestore:", error);
+        isOnlineSync = false;
+        $("#sync-status").html(`
+            <div class="alert alert-danger py-2 small">
+                <i class="bi bi-x-circle-fill me-1"></i> Error de sincronización
+            </div>
+        `);
+    });
+}
+
+// Modificar la función saveToLocalStorage para sincronizar con Firestore
 function saveToLocalStorage() {
     // Obtener tableros existentes
     const existingBoards = getStoredBoards();
@@ -76,8 +295,53 @@ function saveToLocalStorage() {
     // Actualizar la lista de tableros
     updateBoardsList();
     
+    // Si el usuario está autenticado, sincronizar con Firestore
+    if (currentUser) {
+        // Mostrar indicador de sincronización
+        $("#sync-status").html(`
+            <div class="alert alert-warning py-2 small">
+                <i class="bi bi-arrow-repeat me-1"></i> Sincronizando...
+            </div>
+        `);
+        
+        saveToFirestore(boardData);
+    }
+    
     return boardData;
 }
+
+// Modificar la función deleteBoard para sincronizar con Firestore
+function deleteBoard(boardId) {
+    const boards = getStoredBoards();
+    const filteredBoards = boards.filter(board => board.id !== boardId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredBoards));
+    
+    // Si el tablero actual es el que se está eliminando, limpiar la interfaz
+    if (currentBoardId === boardId) {
+        resetUI();
+    }
+    
+    updateBoardsList();
+    
+    // Si el usuario está autenticado, eliminar de Firestore
+    if (currentUser) {
+        db.collection('users').doc(currentUser.uid).collection('boards').doc(boardId.toString()).delete()
+            .catch(error => {
+                console.error("Error al eliminar de Firestore:", error);
+            });
+    }
+}
+
+// Escuchar eventos de autenticación
+auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    updateAuthUI(user);
+    
+    if (user) {
+        // Usuario autenticado, sincronizar tableros
+        syncBoardsAfterLogin(user);
+    }
+});
 
 // Función para cargar los tableros guardados
 function getStoredBoards() {
@@ -133,20 +397,6 @@ function loadBoard(boardId) {
         return true;
     }
     return false;
-}
-
-// Función para eliminar un tablero
-function deleteBoard(boardId) {
-    const boards = getStoredBoards();
-    const filteredBoards = boards.filter(board => board.id !== boardId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredBoards));
-    
-    // Si el tablero actual es el que se está eliminando, limpiar la interfaz
-    if (currentBoardId === boardId) {
-        resetUI();
-    }
-    
-    updateBoardsList();
 }
 
 // Función para mostrar la interfaz completa
@@ -619,6 +869,10 @@ $(document).ready(function() {
         currentChartSort = $(this).val();
         updateCharts();
     });
+
+    // Manejadores de eventos para autenticación
+    $("#google-login-btn").on("click", loginWithGoogle);
+    $("#logout-btn").on("click", logout);
 });
 
 // Función para calcular las horas en la calculadora

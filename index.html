@@ -17,6 +17,43 @@
                 <div class="sticky-top" style="top: 20px;">
                     <h2 class="mb-4">Mi Vida en Semanas</h2>
                     
+                    <!-- Sección de autenticación -->
+                    <div id="auth-section" class="mb-4">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Mi Cuenta</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Estado no autenticado -->
+                                <div id="not-logged-in">
+                                    <p class="text-muted mb-3">Inicia sesión para sincronizar tus tableros entre dispositivos.</p>
+                                    <button id="google-login-btn" class="btn btn-primary w-100">
+                                        <i class="bi bi-google me-2"></i> Iniciar sesión con Google
+                                    </button>
+                                </div>
+                                
+                                <!-- Estado autenticado -->
+                                <div id="logged-in" style="display: none;">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img id="user-photo" src="" alt="Foto de perfil" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                                        <div>
+                                            <strong id="user-name"></strong>
+                                            <div class="text-muted small" id="user-email"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3" id="sync-status">
+                                        <div class="alert alert-success py-2 small">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Tableros sincronizados
+                                        </div>
+                                    </div>
+                                    <button id="logout-btn" class="btn btn-outline-secondary w-100">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Tableros guardados -->
                     <div id="saved-boards" class="mb-4">
                         <div class="card">
@@ -355,6 +392,16 @@
     <script src="https://cdn.jsdelivr.net/npm/spectrum-colorpicker2@2.0.10/dist/spectrum.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Configuración Firebase -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Script principal -->
     <script src="script.js"></script>
 </body>
 </html> 

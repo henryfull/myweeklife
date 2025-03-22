@@ -499,4 +499,39 @@ h1, h2, h3, h4, h5 {
 
 .btn-group .dropdown-item i {
     margin-right: 5px;
+}
+
+/* Estilos para la sección de autenticación */
+#auth-section .card {
+    border-left: 4px solid #17a2b8;
+    transition: all 0.3s ease;
+}
+
+#auth-section .card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#google-login-btn {
+    background-color: #4285F4;
+    border-color: #4285F4;
+    transition: all 0.3s ease;
+}
+
+#google-login-btn:hover {
+    background-color: #357ae8;
+    transform: translateY(-2px);
+}
+
+#user-photo {
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#sync-status .alert {
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+
+#logged-in {
+    animation: fadeIn 0.4s ease;
 } 
