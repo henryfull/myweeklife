@@ -1,0 +1,419 @@
+/* Estilos generales */
+body {
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #333;
+    font-weight: 700;
+}
+
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+/* Estilos para el panel lateral */
+.sidebar {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #dee2e6;
+    height: 100%;
+}
+
+.sticky-top {
+    z-index: 1020;
+}
+
+/* Estilos para la configuración */
+#update-btn {
+    transition: all 0.3s ease;
+}
+
+#update-btn:hover {
+    background-color: #e6a800;
+    transform: translateY(-2px);
+}
+
+/* Estilos para los tableros guardados */
+.board-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.board-item:hover {
+    background-color: #e0e0e0;
+    transform: translateX(5px);
+}
+
+.board-item-title {
+    font-weight: 600;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.board-item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.board-item.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196f3;
+}
+
+#save-board-btn, #export-pdf-btn {
+    transition: all 0.3s ease;
+}
+
+#save-board-btn:hover {
+    background-color: #17a2b8;
+    transform: translateY(-2px);
+}
+
+#export-pdf-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+/* Estilos para la calculadora de horas */
+#hours-calculator .card {
+    border-left: 5px solid #28a745;
+}
+
+#calculator-result {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
+}
+
+#use-calculation-btn {
+    background-color: #4caf50;
+    border-color: #388e3c;
+    color: white;
+}
+
+#use-calculation-btn:hover {
+    background-color: #388e3c;
+}
+
+/* Estilos específicos para la cuadrícula de semanas */
+#weeks-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.year-row {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 2px;
+}
+
+.year-label {
+    width: 40px;
+    font-size: 0.8rem;
+    text-align: right;
+    padding-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: bold;
+}
+
+.weeks-container {
+    display: flex;
+    gap: 2px;
+    flex-grow: 1;
+}
+
+.week {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.week:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.week:active {
+    transform: scale(0.95);
+}
+
+.week-lived {
+    background-color: #757575;
+}
+
+/* Estilo para la fila resaltada en la tabla */
+.highlighted-activity {
+    background-color: #f8f9fa !important;
+    animation: highlight-pulse 2s infinite;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes highlight-pulse {
+    0% { background-color: #f8f9fa !important; }
+    50% { background-color: #e3f2fd !important; }
+    100% { background-color: #f8f9fa !important; }
+}
+
+/* Estilos para el toast de información */
+.toast {
+    min-width: 300px;
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.toast-header {
+    border-bottom: none;
+    padding: 0.75rem 1rem;
+}
+
+.toast-body {
+    padding: 1rem;
+    background-color: white;
+}
+
+/* Estilos para actividades */
+.activity-color {
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.btn-action {
+    margin-right: 5px;
+}
+
+/* Estilos para el selector de color */
+.sp-replacer {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 100%;
+    height: 38px;
+}
+
+.sp-preview {
+    width: calc(100% - 20px);
+    height: 100%;
+}
+
+/* Leyenda de colores */
+.weeks-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilos para los contadores de tiempo */
+#remaining-time-container .card {
+    background-color: #fff8e1;
+    transition: all 0.3s ease;
+}
+
+#remaining-time-container .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+#remaining-time-container h4 {
+    font-size: 1.5rem;
+    color: #ff6f00;
+    margin-bottom: 0;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#calculator-result, .board-item {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Animación para botones */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#export-pdf-btn {
+    animation: pulse 2s infinite;
+}
+
+/* Estilos para el modal de eliminación */
+#deleteModal .modal-content {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#deleteModal .modal-header {
+    background-color: #f44336;
+    color: white;
+}
+
+#board-to-delete-name {
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar {
+        margin-bottom: 20px;
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .week {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .year-label {
+        width: 30px;
+        font-size: 0.7rem;
+    }
+
+    .board-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .board-item-actions {
+        margin-top: 5px;
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 576px) {
+    .week {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .year-label {
+        width: 25px;
+        font-size: 0.65rem;
+    }
+}
+
+/* Estilos para las pestañas y gráficos */
+.nav-tabs {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.8rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border: none;
+    color: #007bff;
+}
+
+.nav-tabs .nav-link.active {
+    border: none;
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+    font-weight: 600;
+}
+
+.tab-content {
+    padding-top: 1rem;
+}
+
+.chart-container {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Animaciones para los gráficos */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-pane.show {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+/* Estilos para los controles de gráficos */
+.chart-controls {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-left: 4px solid #007bff;
+}
+
+.chart-controls:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-controls label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.chart-controls select {
+    font-weight: 500;
+    transition: border-color 0.2s ease;
+}
+
+.chart-controls select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+} 
